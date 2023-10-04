@@ -1,13 +1,27 @@
-function tokenIsValid(req) {
+const User = require("../entity/User");
 
-    let tokens = [
+async function tokenIsValid(req) {
+
+    //let tokens = [
         //controlando acessos ao endpoint
-        'ana01',
-        'beatriz01',
-        'girao01',
-    ];
+    //    'ana01',
+    //    'beatriz01',
+    //    'girao01',
+    //];
 
-    return tokens.includes(req.headers.token);
+    //return tokens.includes(req.headers.token);
+
+    let user = await User.findAll({
+        where: {
+            token: req.headers.token
+        }
+    });
+
+    if (user.length === 0) {
+        return false;
+    }
+
+    return user;
 }
 
 function errorPermission(res) {
@@ -16,8 +30,8 @@ function errorPermission(res) {
     });
 }
 
-function validSecurity(req, res, next) {
-    if (!tokenIsValid(req)) {
+async function validSecurity(req, res, next) {
+    if (! await tokenIsValid(req)) {
         errorPermission(res);
         return;
     }
